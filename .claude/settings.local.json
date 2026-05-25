@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node /Users/chrisedge/Other/BudgetTool/node_modules/typescript/lib/tsc.js --noEmit)"
+    ]
+  }
+}
