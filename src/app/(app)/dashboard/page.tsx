@@ -15,9 +15,8 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { PointsBadge } from "@/components/gamification/PointsBadge";
 import { StreakCounter } from "@/components/gamification/StreakCounter";
-import { GoalProgress } from "@/components/goals/GoalProgress";
 import { PaydayBanner } from "@/components/income/PaydayBanner";
-import { ArrowRight, Wallet, Target } from "lucide-react";
+import { ArrowRight, Wallet, Target, PiggyBank } from "lucide-react";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -43,11 +42,17 @@ export default function DashboardPage() {
     });
   }, [pendingSources.length]);
 
-  const totalExpenses = budget?.expenses.reduce((s, e) => s + e.amount, 0) ?? 0;
   const income = budget?.income ?? 0;
+  const totalExpenses = (budget?.expenses.reduce((s, e) => s + e.amount, 0) ?? 0) + (budget?.savings ?? 0);
   const remaining = income - totalExpenses;
   const budgetPct = income > 0 ? Math.min((totalExpenses / income) * 100, 100) : 0;
   const onBudget = income > 0 && totalExpenses <= income;
+
+  const generalSavings = budget?.savings ?? 0;
+  const goalExpenses = (budget?.expenses ?? []).filter((e) => e.goalId);
+  const goalContributions = goalExpenses.reduce((s, e) => s + e.amount, 0);
+  const totalSavings = generalSavings + goalContributions;
+  const savingsRate = income > 0 ? Math.round((totalSavings / income) * 100) : 0;
 
   const activeGoals = goals.filter((g) => g.status === "active").slice(0, 3);
 
@@ -131,6 +136,55 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
+      {/* Savings */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <PiggyBank className="h-4 w-4" />
+            Savings
+          </CardTitle>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/savings">Details <ArrowRight className="ml-1 h-3 w-3" /></Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {income === 0 ? (
+            <p className="text-sm text-muted-foreground">Set up your budget to track savings.</p>
+          ) : (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-xl font-bold">${totalSavings.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Saved this month</p>
+                </div>
+                <div>
+                  <p className={`text-xl font-bold ${savingsRate >= 20 ? "text-green-600" : ""}`}>
+                    {savingsRate}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">Savings rate</p>
+                </div>
+              </div>
+              {totalSavings > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  {generalSavings > 0 && (
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" /> General</span>
+                      <span>${generalSavings.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {goalContributions > 0 && (
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> Goals</span>
+                      <span>${goalContributions.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Active goals */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -150,15 +204,32 @@ export default function DashboardPage() {
             </p>
           ) : (
             <div className="space-y-4">
-              {activeGoals.map((g) => (
-                <div key={g.id} className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium">{g.title}</span>
-                    <span className="text-muted-foreground">${g.targetAmount.toLocaleString()}</span>
+              {activeGoals.map((g) => {
+                const contribution = goalExpenses.find((e) => e.goalId === g.id);
+                const pct = g.targetAmount > 0 ? Math.min((g.currentAmount / g.targetAmount) * 100, 100) : 0;
+                const remaining = g.targetAmount - g.currentAmount;
+                const monthsLeft = contribution && contribution.amount > 0
+                  ? Math.ceil(remaining / contribution.amount)
+                  : null;
+                return (
+                  <div key={g.id} className="space-y-1.5">
+                    <div className="flex justify-between items-baseline text-sm">
+                      <span className="font-medium">{g.title}</span>
+                      <span className="text-muted-foreground text-xs">
+                        ${g.currentAmount.toLocaleString()} / ${g.targetAmount.toLocaleString()}
+                      </span>
+                    </div>
+                    <Progress value={pct} className="h-2 [&>div]:bg-green-500" />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{Math.round(pct)}% saved</span>
+                      {pct >= 100
+                        ? <span className="text-green-600 font-medium">Goal reached!</span>
+                        : monthsLeft && <span>~{monthsLeft} month{monthsLeft !== 1 ? "s" : ""} to go</span>
+                      }
+                    </div>
                   </div>
-                  <GoalProgress current={g.currentAmount} target={g.targetAmount} />
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>

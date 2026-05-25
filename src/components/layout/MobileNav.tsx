@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Wallet, Target, Trophy, Settings } from "lucide-react";
+import { LayoutDashboard, Wallet, Target, PiggyBank, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 const NAV = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/budget", label: "Budget", icon: Wallet },
+  { href: "/savings", label: "Savings", icon: PiggyBank },
   { href: "/goals", label: "Goals", icon: Target },
-  { href: "/leaderboard", label: "Rank", icon: Trophy },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

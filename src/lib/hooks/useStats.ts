@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getDoc, setDoc } from "firebase/firestore";
 import { statsDoc, leaderboardDoc, StatsDoc, GoalDoc } from "@/lib/firebase/firestore";
-import { calcPointsForBudget, calcPointsForGoal } from "@/lib/utils/points";
+import { calcPointsForBudget, calcPointsForGoal, calcPointsForSavings } from "@/lib/utils/points";
 import { userDoc } from "@/lib/firebase/firestore";
 import { currentMonthKey } from "@/lib/utils/dates";
 
@@ -32,7 +32,7 @@ export function useStats(uid: string | undefined) {
 
   const recordBudgetMonth = useCallback(
     async (
-      budget: { income: number; expenses: { amount: number }[]; updatedAt: number },
+      budget: { income: number; expenses: { amount: number; goalId?: string }[]; savings?: number; updatedAt: number },
       monthKey?: string
     ) => {
       if (!uid) return;
@@ -43,12 +43,21 @@ export function useStats(uid: string | undefined) {
       // Idempotent — skip if this month was already recorded
       if (current.lastRecordedMonth === key) return;
 
-      const totalExpenses = budget.expenses.reduce((s, e) => s + e.amount, 0);
+      const savings = budget.savings ?? 0;
+      const totalExpenses = budget.expenses.reduce((s, e) => s + e.amount, 0) + savings;
       const onBudget = budget.income > 0 && totalExpenses <= budget.income;
 
       const newStreak = onBudget ? current.currentBudgetStreak + 1 : 0;
       const newLongest = Math.max(current.longestBudgetStreak, newStreak);
-      const earned = onBudget ? calcPointsForBudget(budget, newStreak) : 0;
+
+      let earned = 0;
+      if (onBudget) {
+        earned += calcPointsForBudget(newStreak);
+        const goalTotal = budget.expenses.filter((e) => e.goalId).reduce((s, e) => s + e.amount, 0);
+        const savingsRate = budget.income > 0 ? ((savings + goalTotal) / budget.income) * 100 : 0;
+        earned += calcPointsForSavings(savingsRate);
+      }
+
       const newStats: StatsDoc = {
         ...current,
         points: current.points + earned,

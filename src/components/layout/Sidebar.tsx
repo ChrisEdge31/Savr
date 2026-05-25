@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Wallet, Target, Trophy, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Wallet, Target, Trophy, Settings, LogOut, PiggyBank } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logout } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/budget", label: "Budget", icon: Wallet },
+  { href: "/savings", label: "Savings", icon: PiggyBank },
   { href: "/goals", label: "Goals", icon: Target },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/settings", label: "Settings", icon: Settings },

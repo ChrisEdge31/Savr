@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { previousMonthKey } from "@/lib/utils/dates";
+import { calcPointsForBudget, calcPointsForSavings } from "@/lib/utils/points";
 
-// Allow up to 60s — iterating over all users can take time
 export const maxDuration = 60;
 
 const DEFAULT_STATS = {
@@ -15,10 +15,12 @@ const DEFAULT_STATS = {
   lastRecordedMonth: undefined as string | undefined,
 };
 
-function calcPoints(streak: number): number {
-  let pts = 100;
-  if (streak >= 3) pts += 25;
-  return pts;
+/** Returns [monthStart, monthEnd) timestamps for a YYYY-MM key */
+function monthBounds(monthKey: string): [number, number] {
+  const [year, month] = monthKey.split("-").map(Number);
+  const start = new Date(year, month - 1, 1).getTime();
+  const end = new Date(year, month, 1).getTime();
+  return [start, end];
 }
 
 export async function GET(request: NextRequest) {
@@ -28,7 +30,8 @@ export async function GET(request: NextRequest) {
   }
 
   const db = getAdminDb();
-  const monthKey = previousMonthKey(); // closes the month that just ended
+  const monthKey = previousMonthKey();
+  const [monthStart, monthEnd] = monthBounds(monthKey);
 
   const usersSnap = await db.collection("users").get();
   const results: Record<string, string> = {};
@@ -44,7 +47,9 @@ export async function GET(request: NextRequest) {
         }
 
         const statsSnap = await db.doc(`users/${uid}/stats/main`).get();
-        const current = statsSnap.exists ? { ...DEFAULT_STATS, ...statsSnap.data() } : { ...DEFAULT_STATS };
+        const current = statsSnap.exists
+          ? { ...DEFAULT_STATS, ...statsSnap.data() }
+          : { ...DEFAULT_STATS };
 
         if (current.lastRecordedMonth === monthKey) {
           results[uid] = "skip — already recorded";
@@ -52,14 +57,43 @@ export async function GET(request: NextRequest) {
         }
 
         const budget = budgetSnap.data()!;
-        const totalExpenses =
-          ((budget.expenses ?? []) as { amount: number }[]).reduce((s, e) => s + e.amount, 0) +
-          (budget.savings ?? 0);
-        const onBudget = budget.income > 0 && totalExpenses <= budget.income;
+        const updatedAt: number = budget.updatedAt ?? 0;
+
+        // AFK check: user must have saved their budget during the closed month
+        // and must have at least one expense or savings entry
+        const savedThisMonth = updatedAt >= monthStart && updatedAt < monthEnd;
+        type ExpenseRow = { amount: number; goalId?: string };
+        const expenses = (budget.expenses ?? []) as ExpenseRow[];
+        const savings: number = budget.savings ?? 0;
+        const hasActivity = expenses.some((e) => e.amount > 0) || savings > 0;
+
+        if (!savedThisMonth || !hasActivity) {
+          // Break streak but don't award points
+          const newStats = {
+            ...current,
+            currentBudgetStreak: 0,
+            lastRecordedMonth: monthKey,
+            lastUpdated: Date.now(),
+          };
+          await db.doc(`users/${uid}/stats/main`).set(newStats);
+          results[uid] = !savedThisMonth ? "afk — streak reset" : "no activity — streak reset";
+          return;
+        }
+
+        const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0) + savings;
+        const income: number = budget.income ?? 0;
+        const onBudget = income > 0 && totalExpenses <= income;
 
         const newStreak = onBudget ? current.currentBudgetStreak + 1 : 0;
         const newLongest = Math.max(current.longestBudgetStreak, newStreak);
-        const earned = onBudget ? calcPoints(newStreak) : 0;
+
+        let earned = 0;
+        if (onBudget) {
+          earned += calcPointsForBudget(newStreak);
+          const goalTotal = expenses.filter((e) => e.goalId).reduce((s, e) => s + e.amount, 0);
+          const savingsRate = income > 0 ? ((savings + goalTotal) / income) * 100 : 0;
+          earned += calcPointsForSavings(savingsRate);
+        }
 
         const newStats = {
           ...current,
