@@ -37,7 +37,7 @@ export function Sidebar({ notificationBell }: Props) {
   return (
     <aside className="hidden md:flex flex-col w-60 h-screen sticky top-0 shrink-0 border-r bg-card px-3 py-4 gap-1">
       <div className="flex items-center justify-between px-3 py-2 mb-2">
-        <span className="text-lg font-bold tracking-tight">BudgetTool</span>
+        <span className="text-lg font-bold tracking-tight">Savr</span>
         {notificationBell}
       </div>
       <Separator className="mb-3" />

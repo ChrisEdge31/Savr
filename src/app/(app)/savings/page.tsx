@@ -33,7 +33,7 @@ export default function SavingsPage() {
   const maxMonthTotal = Math.max(...history.map((m) => m.total), 1);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Savings</h1>
         <p className="text-muted-foreground text-sm">{monthKeyToLabel(monthKey)}</p>

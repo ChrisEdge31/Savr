@@ -26,7 +26,7 @@ export function MobileNav({ bell }: Props) {
     <>
       {/* Mobile top bar with bell */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 h-12 border-b bg-card">
-        <span className="font-bold tracking-tight">BudgetTool</span>
+        <span className="font-bold tracking-tight">Savr</span>
         {bell}
       </div>
 

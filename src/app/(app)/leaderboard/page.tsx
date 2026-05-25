@@ -14,7 +14,7 @@ export default function LeaderboardPage() {
   const { stats } = useStats(user?.uid);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Leaderboard</h1>
@@ -28,7 +28,7 @@ export default function LeaderboardPage() {
           <Shield className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
           <p className="text-sm text-muted-foreground">
             Your income and expense details are <strong className="text-foreground">never shared</strong>.
-            Only your display name, points, streak, and badges are visible to others.
+            Only your display name, points, and streak are visible to others.
           </p>
         </CardContent>
       </Card>

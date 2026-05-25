@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BudgetTool — Budget Smarter, Compete Together",
+  title: "Savr — Budget Smarter, Compete Together",
   description: "Track your budget, set goals, and compete on the leaderboard.",
 };
 

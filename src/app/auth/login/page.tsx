@@ -47,7 +47,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to your BudgetTool account</CardDescription>
+          <CardDescription>Sign in to your Savr account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button
