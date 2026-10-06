@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function GoalForm({ onAdd }: Props) {
+  const { format, symbol, inputPadClass } = useCurrency();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
@@ -63,15 +65,15 @@ export function GoalForm({ onAdd }: Props) {
             <div className="space-y-1">
               <Label htmlFor="target">Target amount</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                <Input id="target" type="number" min={1} placeholder="0" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} className="pl-7" required />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
+                <Input id="target" type="number" min={1} placeholder="0" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} className={inputPadClass} required />
               </div>
             </div>
             <div className="space-y-1">
               <Label htmlFor="current">Already saved</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                <Input id="current" type="number" min={0} placeholder="0" value={currentAmount} onChange={(e) => setCurrentAmount(e.target.value)} className="pl-7" />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
+                <Input id="current" type="number" min={0} placeholder="0" value={currentAmount} onChange={(e) => setCurrentAmount(e.target.value)} className={inputPadClass} />
               </div>
             </div>
           </div>

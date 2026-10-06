@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2, Check, X } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
+import { Pencil, Trash2, Check, X, Briefcase, Laptop, Home, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,12 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { IncomeSource } from "@/lib/firebase/firestore";
 
-const TYPE_ICONS: Record<string, string> = {
-  salary: "💼",
-  freelance: "💻",
-  rental: "🏠",
-  investment: "📈",
-  other: "💰",
+const TYPE_ICONS: Record<string, LucideIcon> = {
+  salary: Briefcase,
+  freelance: Laptop,
+  rental: Home,
+  investment: TrendingUp,
+  other: Wallet,
 };
 
 type Props = {
@@ -24,6 +25,8 @@ type Props = {
 };
 
 export function IncomeSourceCard({ source, onUpdate, onRemove }: Props) {
+  const { format, symbol, inputPadClass } = useCurrency();
+  const TypeIcon = TYPE_ICONS[source.type] ?? Wallet;
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(source.name);
   const [amount, setAmount] = useState(String(source.expectedAmount));
@@ -53,8 +56,8 @@ export function IncomeSourceCard({ source, onUpdate, onRemove }: Props) {
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Source name" />
             <div className="grid grid-cols-2 gap-2">
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-                <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="pl-7" placeholder="Amount" />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{symbol}</span>
+                <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className={inputPadClass} placeholder="Amount" />
               </div>
               <div className="relative">
                 <Input type="number" min={1} max={31} value={payDay} onChange={(e) => setPayDay(e.target.value)} placeholder="Pay day" />
@@ -68,7 +71,9 @@ export function IncomeSourceCard({ source, onUpdate, onRemove }: Props) {
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{TYPE_ICONS[source.type]}</span>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted">
+              <TypeIcon className="h-4 w-4 text-muted-foreground" />
+            </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <p className="font-medium truncate">{source.name}</p>
@@ -76,7 +81,7 @@ export function IncomeSourceCard({ source, onUpdate, onRemove }: Props) {
                   {source.payDay === 31 ? "Last day" : `${source.payDay}th`}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">${source.expectedAmount.toLocaleString()} / month</p>
+              <p className="text-sm text-muted-foreground">{format(source.expectedAmount)} / month</p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
               <Switch

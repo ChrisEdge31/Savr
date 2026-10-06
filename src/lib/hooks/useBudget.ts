@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getDoc, setDoc } from "firebase/firestore";
 import { budgetDoc, BudgetDoc, ExpenseItem } from "@/lib/firebase/firestore";
 import { currentMonthKey, previousMonths } from "@/lib/utils/dates";
+import { sumAllocations } from "@/lib/utils/savings";
 import { v4 as uuid } from "uuid";
 
 const EMPTY_BUDGET: BudgetDoc = { income: 0, expenses: [], savings: 0, updatedAt: 0 };
@@ -36,10 +37,12 @@ export function useBudget(uid: string | undefined, monthKey?: string) {
 
       if (prevSnap.exists()) {
         const prev = prevSnap.data();
+        // Carry over general savings only — account contributions are re-filled from each account's monthly default
+        const prevGeneralSavings = (prev.savings ?? 0) - sumAllocations(prev.savingsAllocations);
         const recurringExpenses = (prev.expenses ?? [])
           .filter((e: ExpenseItem) => e.recurring)
           .map((e: ExpenseItem) => ({ ...e, id: uuid() })); // fresh IDs
-        setBudget({ income: prev.income, expenses: recurringExpenses, savings: prev.savings ?? 0, updatedAt: 0 });
+        setBudget({ income: prev.income, expenses: recurringExpenses, savings: prevGeneralSavings, updatedAt: 0 });
         setSeededFromPrevious(true);
       } else {
         setBudget(EMPTY_BUDGET);
@@ -53,7 +56,7 @@ export function useBudget(uid: string | undefined, monthKey?: string) {
   useEffect(() => { fetch(); }, [fetch]);
 
   const save = useCallback(
-    async (data: { income: number; expenses: ExpenseItem[]; savings: number }) => {
+    async (data: Omit<BudgetDoc, "updatedAt">) => {
       if (!uid) return;
       const doc = { ...data, updatedAt: Date.now() };
       await setDoc(budgetDoc(uid, key), doc);

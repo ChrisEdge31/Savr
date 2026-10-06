@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import { getDoc } from "firebase/firestore";
 import { budgetDoc, ExpenseItem } from "@/lib/firebase/firestore";
 import { previousMonths, monthKeyToLabel } from "@/lib/utils/dates";
+import { sumAllocations } from "@/lib/utils/savings";
 
 export type MonthSavingsData = {
   month: string;
   label: string;
-  savings: number;
+  savings: number; // general savings only
+  accountContributions: number;
   goalContributions: number;
   income: number;
   total: number;
@@ -30,14 +32,23 @@ export function useSavingsHistory(uid: string | undefined, count = 6) {
         snaps.map((snap, i) => {
           const month = keys[i];
           const label = monthKeyToLabel(month);
-          if (!snap.exists()) return { month, label, savings: 0, goalContributions: 0, income: 0, total: 0 };
+          if (!snap.exists()) return { month, label, savings: 0, accountContributions: 0, goalContributions: 0, income: 0, total: 0 };
 
           const d = snap.data();
           const goalContributions = ((d.expenses ?? []) as ExpenseItem[])
             .filter((e) => e.goalId)
             .reduce((s, e) => s + e.amount, 0);
-          const savings = d.savings ?? 0;
-          return { month, label, savings, goalContributions, income: d.income ?? 0, total: savings + goalContributions };
+          const accountContributions = sumAllocations(d.savingsAllocations);
+          const savings = (d.savings ?? 0) - accountContributions;
+          return {
+            month,
+            label,
+            savings,
+            accountContributions,
+            goalContributions,
+            income: d.income ?? 0,
+            total: savings + accountContributions + goalContributions,
+          };
         })
       );
       setLoading(false);

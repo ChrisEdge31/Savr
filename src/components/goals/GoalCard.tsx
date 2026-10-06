@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCurrency } from "@/context/CurrencyContext";
 import { CheckCircle2, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export function GoalCard({ goal, onUpdate, onRemove, onComplete }: Props) {
+  const { format, symbol, inputPadClass } = useCurrency();
   const [editing, setEditing] = useState(false);
   const [amount, setAmount] = useState(goal.currentAmount);
 
@@ -69,7 +71,7 @@ export function GoalCard({ goal, onUpdate, onRemove, onComplete }: Props) {
       <CardContent className="space-y-3">
         <GoalProgress current={goal.currentAmount} target={goal.targetAmount} />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Target: ${goal.targetAmount.toLocaleString()}</span>
+          <span>Target: {format(goal.targetAmount)}</span>
           {daysLeft !== null && (
             <span className={daysLeft < 7 ? "text-destructive" : ""}>
               {daysLeft > 0 ? `${daysLeft}d left` : "Overdue"}
@@ -93,13 +95,13 @@ export function GoalCard({ goal, onUpdate, onRemove, onComplete }: Props) {
                 <div className="flex-1 space-y-1">
                   <Label className="text-xs">Current amount saved</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{symbol}</span>
                     <Input
                       type="number"
                       min={0}
                       value={amount || ""}
                       onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-                      className="pl-7 h-8 text-sm"
+                      className={`${inputPadClass} h-8 text-sm`}
                     />
                   </div>
                 </div>

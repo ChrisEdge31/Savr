@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Bell, X, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ type Props = {
 };
 
 export function PaydayBanner({ pendingSources, onLog }: Props) {
+  const { format, symbol, inputPadClass } = useCurrency();
   const [amounts, setAmounts] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -61,18 +63,18 @@ export function PaydayBanner({ pendingSources, onLog }: Props) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-1">
                       <span className="text-sm font-medium truncate">{source.name}</span>
-                      <Badge variant="outline" className="text-xs">expected ${source.expectedAmount.toLocaleString()}</Badge>
+                      <Badge variant="outline" className="text-xs">expected {format(source.expectedAmount)}</Badge>
                     </div>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{symbol}</span>
                         <Input
                           type="number"
                           min={0}
                           placeholder={String(source.expectedAmount)}
                           value={amounts[source.id!] ?? ""}
                           onChange={(e) => setAmounts((a) => ({ ...a, [source.id!]: e.target.value }))}
-                          className="pl-7 h-8 text-sm"
+                          className={`${inputPadClass} h-8 text-sm`}
                         />
                       </div>
                       <Button

@@ -27,14 +27,14 @@ export const GOAL_CATEGORIES = [
 export type GoalCategory = (typeof GOAL_CATEGORIES)[number];
 
 export const CATEGORY_COLORS: Record<string, string> = {
-  "Housing": "hsl(var(--chart-1))",
-  "Transportation": "hsl(var(--chart-2))",
-  "Food & Dining": "hsl(var(--chart-3))",
-  "Utilities": "hsl(var(--chart-4))",
-  "Healthcare": "hsl(var(--chart-5))",
+  "Housing": "hsl(12 76% 61%)",
+  "Transportation": "hsl(32 95% 52%)",
+  "Food & Dining": "hsl(48 96% 50%)",
+  "Utilities": "hsl(173 58% 39%)",
+  "Healthcare": "hsl(350 80% 58%)",
   "Entertainment": "hsl(221 83% 53%)",
   "Shopping": "hsl(262 83% 58%)",
   "Education": "hsl(316 72% 50%)",
   "Savings": "hsl(142 71% 45%)",
-  "Other": "hsl(var(--muted-foreground))",
+  "Other": "hsl(215 14% 55%)",
 };

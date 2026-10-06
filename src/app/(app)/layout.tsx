@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 import { useBudget } from "@/lib/hooks/useBudget";
 import { useGoals } from "@/lib/hooks/useGoals";
 import { useIncomeSources } from "@/lib/hooks/useIncomeSources";
@@ -48,24 +49,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar notificationBell={
-        <NotificationBell
-          notifications={notifications}
-          onDismiss={dismiss}
-          onDismissAll={dismissAll}
-        />
-      } />
-      <main className="flex-1 overflow-auto pt-12 md:pt-0 pb-16 md:pb-0">
-        {children}
-      </main>
-      <MobileNav notificationCount={notifications.length} bell={
-        <NotificationBell
-          notifications={notifications}
-          onDismiss={dismiss}
-          onDismissAll={dismissAll}
-        />
-      } />
-    </div>
+    <CurrencyProvider uid={user.uid}>
+      <div className="flex min-h-screen">
+        <Sidebar notificationBell={
+          <NotificationBell
+            notifications={notifications}
+            onDismiss={dismiss}
+            onDismissAll={dismissAll}
+          />
+        } />
+        <main className="flex-1 overflow-auto pt-12 md:pt-0 pb-16 md:pb-0">
+          {children}
+        </main>
+        <MobileNav notificationCount={notifications.length} bell={
+          <NotificationBell
+            notifications={notifications}
+            onDismiss={dismiss}
+            onDismissAll={dismissAll}
+          />
+        } />
+      </div>
+    </CurrencyProvider>
   );
 }

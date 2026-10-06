@@ -8,6 +8,7 @@ import { GoalDoc } from "@/lib/firebase/firestore";
 import { GoalCard } from "@/components/goals/GoalCard";
 import { GoalForm } from "@/components/goals/GoalForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Target } from "lucide-react";
 
 export default function GoalsPage() {
   const { user } = useAuth();
@@ -52,7 +53,7 @@ export default function GoalsPage() {
           <TabsContent value="active" className="mt-4">
             {active.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
-                <p className="text-4xl mb-3">🎯</p>
+                <Target className="h-10 w-10 mx-auto mb-3 opacity-50" />
                 <p className="font-medium">No active goals</p>
                 <p className="text-sm">Create your first goal to start earning points</p>
               </div>

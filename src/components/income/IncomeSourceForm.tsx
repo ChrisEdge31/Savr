@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export function IncomeSourceForm({ onAdd, trigger }: Props) {
+  const { format, symbol, inputPadClass } = useCurrency();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [type, setType] = useState<IncomeSource["type"]>("salary");
@@ -89,7 +91,7 @@ export function IncomeSourceForm({ onAdd, trigger }: Props) {
             <div className="space-y-1">
               <Label htmlFor="amount">Expected monthly</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
                 <Input
                   id="amount"
                   type="number"
@@ -97,7 +99,7 @@ export function IncomeSourceForm({ onAdd, trigger }: Props) {
                   placeholder="0"
                   value={expectedAmount}
                   onChange={(e) => setExpectedAmount(e.target.value)}
-                  className="pl-7"
+                  className={inputPadClass}
                   required
                 />
               </div>

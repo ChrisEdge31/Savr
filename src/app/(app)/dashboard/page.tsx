@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useCurrency } from "@/context/CurrencyContext";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useBudget } from "@/lib/hooks/useBudget";
@@ -9,6 +10,7 @@ import { useStats } from "@/lib/hooks/useStats";
 import { useIncomeSources } from "@/lib/hooks/useIncomeSources";
 import { useIncomeLog } from "@/lib/hooks/useIncomeLog";
 import { currentMonthKey, monthKeyToLabel } from "@/lib/utils/dates";
+import { sumAllocations } from "@/lib/utils/savings";
 import { getPendingSources, requestNotificationPermission, fireBrowserNotification } from "@/lib/utils/notifications";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -19,6 +21,7 @@ import { PaydayBanner } from "@/components/income/PaydayBanner";
 import { ArrowRight, Wallet, Target, PiggyBank } from "lucide-react";
 
 export default function DashboardPage() {
+  const { format } = useCurrency();
   const { user } = useAuth();
   const monthKey = currentMonthKey();
   const { budget } = useBudget(user?.uid, monthKey);
@@ -48,10 +51,11 @@ export default function DashboardPage() {
   const budgetPct = income > 0 ? Math.min((totalExpenses / income) * 100, 100) : 0;
   const onBudget = income > 0 && totalExpenses <= income;
 
-  const generalSavings = budget?.savings ?? 0;
+  const accountContributions = sumAllocations(budget?.savingsAllocations);
+  const generalSavings = (budget?.savings ?? 0) - accountContributions;
   const goalExpenses = (budget?.expenses ?? []).filter((e) => e.goalId);
   const goalContributions = goalExpenses.reduce((s, e) => s + e.amount, 0);
-  const totalSavings = generalSavings + goalContributions;
+  const totalSavings = generalSavings + accountContributions + goalContributions;
   const savingsRate = income > 0 ? Math.round((totalSavings / income) * 100) : 0;
 
   const activeGoals = goals.filter((g) => g.status === "active").slice(0, 3);
@@ -117,16 +121,16 @@ export default function DashboardPage() {
               <Progress value={budgetPct} className={`h-3 ${!onBudget ? "[&>div]:bg-destructive" : ""}`} />
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-lg font-bold">${income.toLocaleString()}</p>
+                  <p className="text-lg font-bold">{format(income)}</p>
                   <p className="text-xs text-muted-foreground">Income</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold">${totalExpenses.toLocaleString()}</p>
+                  <p className="text-lg font-bold">{format(totalExpenses)}</p>
                   <p className="text-xs text-muted-foreground">Budgeted</p>
                 </div>
                 <div>
                   <p className={`text-lg font-bold ${remaining < 0 ? "text-destructive" : "text-green-600"}`}>
-                    ${Math.abs(remaining).toLocaleString()}
+                    {format(Math.abs(remaining))}
                   </p>
                   <p className="text-xs text-muted-foreground">{remaining < 0 ? "Over" : "Remaining"}</p>
                 </div>
@@ -154,7 +158,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <p className="text-xl font-bold">${totalSavings.toLocaleString()}</p>
+                  <p className="text-xl font-bold">{format(totalSavings)}</p>
                   <p className="text-xs text-muted-foreground">Saved this month</p>
                 </div>
                 <div>
@@ -166,16 +170,22 @@ export default function DashboardPage() {
               </div>
               {totalSavings > 0 && (
                 <div className="space-y-1.5 pt-1">
+                  {accountContributions > 0 && (
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-400 inline-block" /> Accounts</span>
+                      <span>{format(accountContributions)}</span>
+                    </div>
+                  )}
                   {generalSavings > 0 && (
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" /> General</span>
-                      <span>${generalSavings.toLocaleString()}</span>
+                      <span>{format(generalSavings)}</span>
                     </div>
                   )}
                   {goalContributions > 0 && (
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> Goals</span>
-                      <span>${goalContributions.toLocaleString()}</span>
+                      <span>{format(goalContributions)}</span>
                     </div>
                   )}
                 </div>
@@ -216,7 +226,7 @@ export default function DashboardPage() {
                     <div className="flex justify-between items-baseline text-sm">
                       <span className="font-medium">{g.title}</span>
                       <span className="text-muted-foreground text-xs">
-                        ${g.currentAmount.toLocaleString()} / ${g.targetAmount.toLocaleString()}
+                        {format(g.currentAmount)} / {format(g.targetAmount)}
                       </span>
                     </div>
                     <Progress value={pct} className="h-2 [&>div]:bg-green-500" />

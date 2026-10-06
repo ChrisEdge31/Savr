@@ -17,10 +17,16 @@ export type ExpenseItem = {
   goalId?: string; // set when this expense is a goal contribution
 };
 
+export type SavingsAllocation = {
+  accountId: string;
+  amount: number;
+};
+
 export type BudgetDoc = {
   income: number;
   expenses: ExpenseItem[];
-  savings: number;
+  savings: number; // total set aside: general savings + all savingsAllocations
+  savingsAllocations?: SavingsAllocation[];
   updatedAt: number;
 };
 
@@ -63,6 +69,7 @@ export type UserDoc = {
   photoURL: string;
   createdAt: number;
   budgetFramework?: string;
+  currency?: string;
 };
 
 export const INCOME_SOURCE_TYPES = ["salary", "freelance", "rental", "investment", "other"] as const;
@@ -74,6 +81,21 @@ export type IncomeSource = {
   type: IncomeSourceType;
   expectedAmount: number;
   payDay: number; // 1-31, day of month
+  active: boolean;
+  createdAt: number;
+};
+
+export const SAVINGS_ACCOUNT_TYPES = ["tfsa", "rrsp", "fhsa", "hysa", "emergency", "brokerage", "other"] as const;
+export type SavingsAccountType = (typeof SAVINGS_ACCOUNT_TYPES)[number];
+
+export type SavingsAccount = {
+  id?: string;
+  name: string;
+  type: SavingsAccountType;
+  balance: number;
+  interestRate: number; // annual %, 0 if none
+  annualLimit: number | null; // max contributions per calendar year, null = no limit
+  monthlyContribution: number; // default amount pre-filled into each new month's budget
   active: boolean;
   createdAt: number;
 };
@@ -110,3 +132,7 @@ export const incomeLogDoc = (uid: string, month: string, sourceId: string) =>
   doc(getDb(), "users", uid, "incomeLogs", `${month}_${sourceId}`) as DocumentReference<IncomeLog>;
 export const incomeLogsCol = (uid: string) =>
   collection(getDb(), "users", uid, "incomeLogs") as CollectionReference<IncomeLog>;
+export const savingsAccountsCol = (uid: string) =>
+  collection(getDb(), "users", uid, "savingsAccounts") as CollectionReference<SavingsAccount>;
+export const savingsAccountDoc = (uid: string, accountId: string) =>
+  doc(getDb(), "users", uid, "savingsAccounts", accountId) as DocumentReference<SavingsAccount>;
