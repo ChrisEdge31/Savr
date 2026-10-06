@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { IncomeSource } from "@/lib/firebase/firestore";
+import { ordinal, ordinalSuffix } from "@/lib/utils/dates";
 
 const TYPE_ICONS: Record<string, LucideIcon> = {
   salary: Briefcase,
@@ -61,7 +62,7 @@ export function IncomeSourceCard({ source, onUpdate, onRemove }: Props) {
               </div>
               <div className="relative">
                 <Input type="number" min={1} max={31} value={payDay} onChange={(e) => setPayDay(e.target.value)} placeholder="Pay day" />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">th</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{ordinalSuffix(parseInt(payDay) || 0)}</span>
               </div>
             </div>
             <div className="flex gap-2">
@@ -78,7 +79,7 @@ export function IncomeSourceCard({ source, onUpdate, onRemove }: Props) {
               <div className="flex items-center gap-2">
                 <p className="font-medium truncate">{source.name}</p>
                 <Badge variant="outline" className="text-xs shrink-0">
-                  {source.payDay === 31 ? "Last day" : `${source.payDay}th`}
+                  {source.payDay === 31 ? "Last day" : ordinal(source.payDay)}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">{format(source.expectedAmount)} / month</p>

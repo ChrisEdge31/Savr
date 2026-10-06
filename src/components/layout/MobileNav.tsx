@@ -26,7 +26,12 @@ export function MobileNav({ bell }: Props) {
     <>
       {/* Mobile top bar with bell */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 h-12 border-b bg-card">
-        <span className="font-bold tracking-tight">Savr</span>
+        <Link href="/dashboard" className="flex items-center gap-2 font-bold tracking-tight">
+          <span className="flex h-6 w-6 items-center justify-center bg-primary text-primary-foreground">
+            <PiggyBank className="h-3.5 w-3.5" />
+          </span>
+          Savr
+        </Link>
         {bell}
       </div>
 
@@ -36,14 +41,15 @@ export function MobileNav({ bell }: Props) {
           <Link
             key={href}
             href={href}
+            aria-current={pathname === href ? "page" : undefined}
             className={cn(
-              "flex flex-1 flex-col items-center justify-center py-2 text-xs gap-1 transition-colors",
+              "flex flex-1 flex-col items-center justify-center gap-1 border-t-2 py-2 text-[10px] font-semibold uppercase tracking-wider transition-colors",
               pathname === href
-                ? "text-primary font-medium"
-                : "text-muted-foreground"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-transparent text-muted-foreground"
             )}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className="h-4 w-4" />
             {label}
           </Link>
         ))}

@@ -39,7 +39,7 @@ export default function RegisterPage() {
     try {
       setLoading(true);
       await registerWithEmail(email, password, name);
-      router.push("/dashboard");
+      router.push("/onboarding");
     } catch {
       toast.error("Registration failed. That email may already be in use.");
     } finally {

@@ -70,6 +70,7 @@ export type UserDoc = {
   createdAt: number;
   budgetFramework?: string;
   currency?: string;
+  onboardingCompleted?: boolean;
 };
 
 export const INCOME_SOURCE_TYPES = ["salary", "freelance", "rental", "investment", "other"] as const;

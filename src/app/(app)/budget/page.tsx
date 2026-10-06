@@ -48,6 +48,7 @@ import { useYearContributions } from "@/lib/hooks/useYearContributions";
 import {
 	currentMonthKey,
 	monthKeyToLabel,
+	ordinal,
 	previousMonths,
 } from "@/lib/utils/dates";
 import { FRAMEWORK_MAP } from "@/lib/utils/frameworks";
@@ -281,7 +282,7 @@ export default function BudgetPage() {
 																{s.name}
 															</span>
 															<Badge variant="outline" className="text-xs">
-																{s.payDay === 31 ? "last day" : `${s.payDay}th`}
+																{s.payDay === 31 ? "last day" : ordinal(s.payDay)}
 															</Badge>
 														</div>
 														{log ? (

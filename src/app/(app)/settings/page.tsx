@@ -1,7 +1,5 @@
 "use client";
 
-import { updateProfile } from "firebase/auth";
-import { setDoc } from "firebase/firestore";
 import { Bug, Coins, DollarSign, LayoutGrid, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,12 +28,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
 import { useCurrency } from "@/context/CurrencyContext";
-import { getFirebaseAuth, logout } from "@/lib/firebase/auth";
-import {
-	type IncomeSource,
-	leaderboardDoc,
-	userDoc,
-} from "@/lib/firebase/firestore";
+import { logout, updateDisplayName } from "@/lib/firebase/auth";
+import type { IncomeSource } from "@/lib/firebase/firestore";
 import { useBudget } from "@/lib/hooks/useBudget";
 import { useIncomeSources } from "@/lib/hooks/useIncomeSources";
 import { useStats } from "@/lib/hooks/useStats";
@@ -76,17 +70,7 @@ export default function SettingsPage() {
 		if (!user || !displayName.trim()) return;
 		setSaving(true);
 		try {
-			await updateProfile(getFirebaseAuth().currentUser!, { displayName });
-			await setDoc(
-				userDoc(user.uid),
-				{ displayName } as Parameters<typeof setDoc>[1],
-				{ merge: true },
-			);
-			await setDoc(
-				leaderboardDoc(user.uid),
-				{ displayName } as Parameters<typeof setDoc>[1],
-				{ merge: true },
-			);
+			await updateDisplayName(user.uid, displayName.trim());
 			toast.success("Display name updated.");
 		} catch {
 			toast.error("Failed to update name.");

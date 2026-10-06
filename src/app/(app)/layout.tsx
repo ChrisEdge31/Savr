@@ -16,7 +16,7 @@ import { NotificationBell } from "@/components/layout/NotificationBell";
 import { Loader2 } from "lucide-react";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, needsOnboarding } = useAuth();
   const router = useRouter();
 
   const monthKey = currentMonthKey();
@@ -35,10 +35,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/auth/login");
+    } else if (!loading && needsOnboarding) {
+      router.replace("/onboarding");
     }
-  }, [user, loading, router]);
+  }, [user, loading, needsOnboarding, router]);
 
-  if (loading) {
+  if (loading || needsOnboarding) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

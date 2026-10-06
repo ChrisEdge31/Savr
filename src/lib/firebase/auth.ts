@@ -8,7 +8,9 @@ import {
   updateProfile,
   type Auth,
 } from "firebase/auth";
+import { setDoc } from "firebase/firestore";
 import { app } from "./config";
+import { leaderboardDoc, userDoc } from "./firestore";
 
 let _auth: Auth | null = null;
 
@@ -35,4 +37,11 @@ export async function registerWithEmail(email: string, password: string, display
 
 export async function logout() {
   return signOut(getFirebaseAuth());
+}
+
+/** Updates the display name on the auth profile, the user doc and the public leaderboard entry. */
+export async function updateDisplayName(uid: string, displayName: string) {
+  await updateProfile(getFirebaseAuth().currentUser!, { displayName });
+  await setDoc(userDoc(uid), { displayName } as Parameters<typeof setDoc>[1], { merge: true });
+  await setDoc(leaderboardDoc(uid), { displayName } as Parameters<typeof setDoc>[1], { merge: true });
 }

@@ -34,3 +34,20 @@ export function previousMonths(count: number): string[] {
   }
   return keys;
 }
+
+/** 1 → "st", 2 → "nd", 3 → "rd", 11 → "th", 22 → "nd". */
+export function ordinalSuffix(n: number): string {
+  const lastTwo = n % 100;
+  if (lastTwo >= 11 && lastTwo <= 13) return "th";
+  switch (n % 10) {
+    case 1: return "st";
+    case 2: return "nd";
+    case 3: return "rd";
+    default: return "th";
+  }
+}
+
+/** 1 → "1st", 2 → "2nd", 3 → "3rd", 11 → "11th", 22 → "22nd". */
+export function ordinal(n: number): string {
+  return `${n}${ordinalSuffix(n)}`;
+}
