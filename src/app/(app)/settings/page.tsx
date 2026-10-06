@@ -85,7 +85,7 @@ export default function SettingsPage() {
 	}
 
 	return (
-		<div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+		<div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
 			<div>
 				<h1 className="text-2xl font-bold">Settings</h1>
 				<p className="text-muted-foreground text-sm">
@@ -96,7 +96,7 @@ export default function SettingsPage() {
 			{/* Income Sources */}
 			<Card>
 				<CardHeader>
-					<div className="flex items-center justify-between">
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<CardTitle className="text-base flex items-center gap-2">
 								<DollarSign className="h-4 w-4" />
@@ -289,7 +289,7 @@ export default function SettingsPage() {
 						<Button
 							variant="outline"
 							size="sm"
-							className="w-full"
+							className="w-full h-auto whitespace-normal py-2"
 							disabled={debugWorking}
 							onClick={async () => {
 								setDebugWorking(true);
@@ -317,7 +317,7 @@ export default function SettingsPage() {
 						<Button
 							variant="outline"
 							size="sm"
-							className="w-full text-destructive hover:text-destructive"
+							className="w-full h-auto whitespace-normal py-2 text-destructive hover:text-destructive"
 							disabled={debugWorking}
 							onClick={async () => {
 								setDebugWorking(true);

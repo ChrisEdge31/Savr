@@ -36,6 +36,8 @@ export default function RootLayout({
 			data-scroll-behavior="smooth"
 			className={cn(
 				"h-full antialiased",
+				// Smooth anchor scrolling on the marketing page only, unless the user prefers reduced motion
+				"motion-safe:[&:has(.landing-page)]:scroll-smooth",
 				geistSans.variable,
 				geistMono.variable,
 				jetbrainsMono.variable,

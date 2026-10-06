@@ -230,7 +230,7 @@ export default function BudgetPage() {
 	const unallocated = income - totalAllocated;
 
 	return (
-		<div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+		<div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
 			<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-2xl font-bold">Budget</h1>
@@ -255,8 +255,8 @@ export default function BudgetPage() {
 			{loading ? (
 				<div className="text-muted-foreground text-sm">Loading...</div>
 			) : (
-				<div className="grid md:grid-cols-3 gap-6">
-					<div className="md:col-span-2 space-y-4">
+				<div className="grid xl:grid-cols-3 gap-6">
+					<div className="xl:col-span-2 space-y-4">
 						{/* Income */}
 						<Card>
 							<CardHeader>

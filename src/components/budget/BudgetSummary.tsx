@@ -41,16 +41,16 @@ export function BudgetSummary({
 				<CardTitle className="text-base">Budget Summary</CardTitle>
 			</CardHeader>
 			<CardContent className="space-y-4">
-				<div className="flex justify-between text-sm">
+				<div className="flex justify-between gap-2 text-sm">
 					<span className="text-muted-foreground">Total allocated</span>
-					<span className="font-medium">{format(total)}</span>
+					<span className="shrink-0 whitespace-nowrap font-medium">{format(total)}</span>
 				</div>
 				<Progress value={pct} className="h-2" />
-				<div className="flex justify-between text-sm">
+				<div className="flex justify-between gap-2 text-sm">
 					<span className="text-muted-foreground">Income</span>
-					<span className="font-medium">{format(income)}</span>
+					<span className="shrink-0 whitespace-nowrap font-medium">{format(income)}</span>
 				</div>
-				<div className="flex justify-between text-sm font-medium">
+				<div className="flex justify-between gap-2 text-sm font-medium">
 					<span>Remaining</span>
 					<span
 						className={remaining < 0 ? "text-destructive" : "text-green-600"}
@@ -73,8 +73,8 @@ export function BudgetSummary({
 											CATEGORY_COLORS[cat] ?? CATEGORY_COLORS.Other,
 									}}
 								/>
-								<span className="flex-1 text-muted-foreground">{cat}</span>
-								<span className="font-medium">{format(amt)}</span>
+								<span className="flex-1 min-w-0 truncate text-muted-foreground">{cat}</span>
+								<span className="shrink-0 whitespace-nowrap font-medium">{format(amt)}</span>
 							</div>
 						))}
 					</div>
@@ -90,28 +90,28 @@ export function BudgetSummary({
 							.map((r) => (
 								<div key={r.id} className="flex items-center gap-2 text-sm">
 									<Landmark className="w-2.5 h-2.5 text-blue-500 shrink-0" />
-									<span className="flex-1 text-muted-foreground truncate">
+									<span className="flex-1 min-w-0 truncate text-muted-foreground">
 										{r.label}
 									</span>
-									<span className="font-medium">{format(r.amount)}</span>
+									<span className="shrink-0 whitespace-nowrap font-medium">{format(r.amount)}</span>
 								</div>
 							))}
 						{generalSavings > 0 && (
 							<div className="flex items-center gap-2 text-sm">
 								<PiggyBank className="w-2.5 h-2.5 text-blue-500 shrink-0" />
-								<span className="flex-1 text-muted-foreground">
+								<span className="flex-1 min-w-0 truncate text-muted-foreground">
 									General savings
 								</span>
-								<span className="font-medium">{format(generalSavings)}</span>
+								<span className="shrink-0 whitespace-nowrap font-medium">{format(generalSavings)}</span>
 							</div>
 						)}
 						{goalRows.map((g) => (
 							<div key={g.id} className="flex items-center gap-2 text-sm">
 								<Target className="w-2.5 h-2.5 text-green-600 shrink-0" />
-								<span className="flex-1 text-muted-foreground truncate">
+								<span className="flex-1 min-w-0 truncate text-muted-foreground">
 									{g.label}
 								</span>
-								<span className="font-medium">{format(g.amount)}</span>
+								<span className="shrink-0 whitespace-nowrap font-medium">{format(g.amount)}</span>
 							</div>
 						))}
 					</div>

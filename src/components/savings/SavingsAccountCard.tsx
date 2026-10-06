@@ -45,8 +45,8 @@ export function SavingsAccountCard({
 	const overLimit = limit !== null && contributedThisYear > limit;
 
 	return (
-		<Card className={account.active ? "" : "opacity-50"}>
-			<CardContent className="pt-4 space-y-3">
+		<Card size="sm" className={account.active ? "" : "opacity-50"}>
+			<CardContent className="space-y-3">
 				<div className="flex items-start gap-3">
 					<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted">
 						<TypeIcon className="h-4 w-4 text-muted-foreground" />

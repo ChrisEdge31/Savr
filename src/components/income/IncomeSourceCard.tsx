@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { Pencil, Trash2, Check, X, Briefcase, Laptop, Home, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -50,8 +49,8 @@ export function IncomeSourceCard({ source, onUpdate, onRemove }: Props) {
   }
 
   return (
-    <Card className={source.active ? "" : "opacity-50"}>
-      <CardContent className="pt-4">
+    <Card size="sm" className={source.active ? "" : "opacity-50"}>
+      <CardContent>
         {editing ? (
           <div className="space-y-3">
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Source name" />
@@ -76,13 +75,11 @@ export function IncomeSourceCard({ source, onUpdate, onRemove }: Props) {
               <TypeIcon className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="font-medium truncate">{source.name}</p>
-                <Badge variant="outline" className="text-xs shrink-0">
-                  {source.payDay === 31 ? "Last day" : ordinal(source.payDay)}
-                </Badge>
-              </div>
+              <p className="font-medium truncate">{source.name}</p>
               <p className="text-sm text-muted-foreground">{format(source.expectedAmount)} / month</p>
+              <p className="text-xs text-muted-foreground">
+                Paid {source.payDay === 31 ? "on the last day" : `on the ${ordinal(source.payDay)}`}
+              </p>
             </div>
             <div className="flex items-center gap-1 shrink-0">
               <Switch

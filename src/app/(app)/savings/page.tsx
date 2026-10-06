@@ -70,7 +70,7 @@ export default function SavingsPage() {
 	const maxMonthTotal = Math.max(...history.map((m) => m.total), 1);
 
 	return (
-		<div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+		<div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
 			<div>
 				<h1 className="text-2xl font-bold">Savings</h1>
 				<p className="text-muted-foreground text-sm">
@@ -131,7 +131,7 @@ export default function SavingsPage() {
 
 			{/* Savings accounts */}
 			<Card>
-				<CardHeader className="flex flex-row items-center justify-between pb-2">
+				<CardHeader className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between">
 					<div>
 						<CardTitle className="text-base flex items-center gap-2">
 							<Landmark className="h-4 w-4" />

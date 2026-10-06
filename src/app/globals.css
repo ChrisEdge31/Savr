@@ -128,9 +128,3 @@
     @apply font-mono;
   }
 }
-/* Smooth in-page anchor scrolling on the marketing page only */
-@media (prefers-reduced-motion: no-preference) {
-  html:has(.landing-page) {
-    scroll-behavior: smooth;
-  }
-}

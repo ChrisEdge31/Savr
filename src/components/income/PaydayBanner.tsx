@@ -6,7 +6,6 @@ import { Bell, X, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { PendingIncome } from "@/lib/utils/notifications";
 import { toast } from "sonner";
 
@@ -60,11 +59,11 @@ export function PaydayBanner({ pendingSources, onLog }: Props) {
               {pendingSources.map((source) => (
                 <div key={source.id} className="flex items-center gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-1">
+                    <div className="flex flex-wrap items-baseline gap-x-1.5 mb-1">
                       <span className="text-sm font-medium truncate">{source.name}</span>
-                      <Badge variant="outline" className="text-xs">
+                      <span className="text-xs text-muted-foreground">
                         paid {source.payDate.toLocaleDateString(undefined, { day: "numeric", month: "short" })} · expected {format(source.expectedAmount)}
-                      </Badge>
+                      </span>
                     </div>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
