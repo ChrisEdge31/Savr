@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
-import { IncomeSource, GoalDoc } from "@/lib/firebase/firestore";
-import { getPendingSources } from "@/lib/utils/notifications";
+import { GoalDoc } from "@/lib/firebase/firestore";
+import { PendingIncome } from "@/lib/utils/notifications";
 import { currentMonthKey } from "@/lib/utils/dates";
 
 export type AppNotification = {
@@ -14,15 +14,13 @@ export type AppNotification = {
 };
 
 export function useNotifications({
-  sources,
+  pendingSources,
   goals,
   budgetIncome,
-  loggedSourceIds,
 }: {
-  sources: IncomeSource[];
+  pendingSources: PendingIncome[];
   goals: GoalDoc[];
   budgetIncome: number;
-  loggedSourceIds: Set<string>;
 }) {
   const [dismissed, setDismissed] = useState<Set<string>>(() => {
     if (typeof window === "undefined") return new Set();
@@ -50,13 +48,12 @@ export function useNotifications({
     const items: AppNotification[] = [];
 
     // Income due notifications
-    const pending = getPendingSources(sources, loggedSourceIds);
-    for (const s of pending) {
+    for (const s of pendingSources) {
       items.push({
-        id: `income_${s.id}`,
+        id: `income_${s.id}_${s.payMonth}`,
         type: "income_due",
         title: "Log your income",
-        description: `${s.name} — payday was yesterday. Log what you received.`,
+        description: `${s.name} — paid ${s.payDate.toLocaleDateString(undefined, { day: "numeric", month: "short" })}. Log what you received.`,
         href: "/budget",
       });
     }
@@ -92,7 +89,7 @@ export function useNotifications({
     }
 
     return items;
-  }, [sources, goals, budgetIncome, loggedSourceIds]);
+  }, [pendingSources, goals, budgetIncome]);
 
   const visible = useMemo(
     () => all.filter((n) => !dismissed.has(n.id)),

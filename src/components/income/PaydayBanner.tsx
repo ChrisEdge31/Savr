@@ -7,13 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { IncomeSource } from "@/lib/firebase/firestore";
+import { PendingIncome } from "@/lib/utils/notifications";
 import { toast } from "sonner";
 
 type Props = {
-  pendingSources: IncomeSource[];
-  loggedSourceIds: Set<string>;
-  onLog: (sourceId: string, sourceName: string, amount: number) => Promise<void>;
+  pendingSources: PendingIncome[];
+  onLog: (source: PendingIncome, amount: number) => Promise<void>;
 };
 
 export function PaydayBanner({ pendingSources, onLog }: Props) {
@@ -24,7 +23,7 @@ export function PaydayBanner({ pendingSources, onLog }: Props) {
 
   if (dismissed || pendingSources.length === 0) return null;
 
-  async function handleLog(source: IncomeSource) {
+  async function handleLog(source: PendingIncome) {
     const id = source.id!;
     const raw = parseFloat(amounts[id] ?? "");
     if (isNaN(raw) || raw < 0) {
@@ -33,7 +32,7 @@ export function PaydayBanner({ pendingSources, onLog }: Props) {
     }
     setSubmitting(id);
     try {
-      await onLog(id, source.name, raw);
+      await onLog(source, raw);
       toast.success(`${source.name} income logged!`);
     } finally {
       setSubmitting(null);
@@ -63,7 +62,9 @@ export function PaydayBanner({ pendingSources, onLog }: Props) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-1">
                       <span className="text-sm font-medium truncate">{source.name}</span>
-                      <Badge variant="outline" className="text-xs">expected {format(source.expectedAmount)}</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        paid {source.payDate.toLocaleDateString(undefined, { day: "numeric", month: "short" })} · expected {format(source.expectedAmount)}
+                      </Badge>
                     </div>
                     <div className="flex gap-2">
                       <div className="relative flex-1">

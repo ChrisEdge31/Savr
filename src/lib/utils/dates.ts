@@ -1,6 +1,9 @@
 export function currentMonthKey(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  return monthKeyOf(new Date());
+}
+
+export function monthKeyOf(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
 export function monthKeyToLabel(key: string): string {

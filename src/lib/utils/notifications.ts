@@ -1,37 +1,48 @@
 import { IncomeSource } from "@/lib/firebase/firestore";
+import { monthKeyOf } from "@/lib/utils/dates";
 
-/** Returns the date the notification should fire (day after payday). */
-export function getNotificationDate(payDay: number, referenceDate: Date = new Date()): Date {
-  const year = referenceDate.getFullYear();
-  const month = referenceDate.getMonth();
+/** How many days after payday the "log your income" reminder stays up if it hasn't been logged. */
+export const INCOME_REMINDER_DAYS = 7;
+
+export type PendingIncome = IncomeSource & {
+  payDate: Date;
+  payMonth: string; // YYYY-MM the pay date fell in — the month the log is recorded against
+};
+
+/** The pay date in a given month. Pay days past the end of the month fall on its last day (31 → 28 Feb). */
+export function payDateInMonth(payDay: number, year: number, month: number): Date {
   const lastDay = new Date(year, month + 1, 0).getDate();
-  const effectivePayDay = Math.min(payDay, lastDay);
-
-  if (effectivePayDay >= lastDay) {
-    // Payday is last day of month → notify on 1st of next month
-    return new Date(year, month + 1, 1);
-  }
-  return new Date(year, month, effectivePayDay + 1);
+  return new Date(year, month, Math.min(payDay, lastDay));
 }
 
-/** Returns true if today is the notification day for this pay day. */
-export function isNotificationDay(payDay: number, today: Date = new Date()): boolean {
-  const notifDate = getNotificationDate(payDay, today);
-  return (
-    today.getDate() === notifDate.getDate() &&
-    today.getMonth() === notifDate.getMonth() &&
-    today.getFullYear() === notifDate.getFullYear()
-  );
+/** The most recent pay date strictly before `today` — this month's if it has passed, otherwise last month's. */
+export function mostRecentPayDate(payDay: number, today: Date = new Date()): Date {
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const thisMonth = payDateInMonth(payDay, today.getFullYear(), today.getMonth());
+  if (thisMonth < startOfToday) return thisMonth;
+  return payDateInMonth(payDay, today.getFullYear(), today.getMonth() - 1);
 }
 
-/** Returns sources that are due for income logging today and haven't been logged yet. */
+/**
+ * Sources whose most recent payday was 1–INCOME_REMINDER_DAYS days ago and haven't been logged for that pay month.
+ * `isLogged` must be able to answer for both this month and last month, since a payday on the last day of
+ * the month is only reminded about once the next month has started.
+ */
 export function getPendingSources(
   sources: IncomeSource[],
-  loggedSourceIds: Set<string>
-): IncomeSource[] {
-  return sources.filter(
-    (s) => s.active && isNotificationDay(s.payDay) && !loggedSourceIds.has(s.id ?? "")
-  );
+  isLogged: (sourceId: string, monthKey: string) => boolean,
+  today: Date = new Date()
+): PendingIncome[] {
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return sources.flatMap((s) => {
+    if (!s.active || !s.id) return [];
+    const payDate = mostRecentPayDate(s.payDay, today);
+    const daysSince = Math.round((startOfToday.getTime() - payDate.getTime()) / 86_400_000);
+    if (daysSince < 1 || daysSince > INCOME_REMINDER_DAYS) return [];
+    const payMonth = monthKeyOf(payDate);
+    if (isLogged(s.id, payMonth)) return [];
+    return [{ ...s, payDate, payMonth }];
+  });
 }
 
 /** Request browser notification permission. Returns the permission state. */

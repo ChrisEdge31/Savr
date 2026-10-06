@@ -118,7 +118,7 @@ export function IncomeSourceForm({ onAdd, trigger }: Props) {
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">of month</span>
               </div>
-              <p className="text-xs text-muted-foreground">You&apos;ll be reminded the day after</p>
+              <p className="text-xs text-muted-foreground">Use 31 for the last day of the month. You&apos;ll be reminded the day after.</p>
             </div>
           </div>
           <div className="flex gap-3 pt-1">

@@ -83,7 +83,7 @@ const STEPS = [
 
 export default function LandingPage() {
 	return (
-		<div className="flex flex-col min-h-screen">
+		<div className="landing-page flex flex-col min-h-screen">
 			{/* Nav */}
 			<header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
 				<div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">

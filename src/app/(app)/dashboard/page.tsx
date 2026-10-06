@@ -8,10 +8,10 @@ import { useBudget } from "@/lib/hooks/useBudget";
 import { useGoals } from "@/lib/hooks/useGoals";
 import { useStats } from "@/lib/hooks/useStats";
 import { useIncomeSources } from "@/lib/hooks/useIncomeSources";
-import { useIncomeLog } from "@/lib/hooks/useIncomeLog";
+import { usePendingIncome } from "@/lib/hooks/usePendingIncome";
 import { currentMonthKey, monthKeyToLabel } from "@/lib/utils/dates";
 import { sumAllocations } from "@/lib/utils/savings";
-import { getPendingSources, requestNotificationPermission, fireBrowserNotification } from "@/lib/utils/notifications";
+import { requestNotificationPermission, fireBrowserNotification } from "@/lib/utils/notifications";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -28,9 +28,7 @@ export default function DashboardPage() {
   const { goals } = useGoals(user?.uid);
   const { stats } = useStats(user?.uid);
   const { sources } = useIncomeSources(user?.uid);
-  const { loggedSourceIds, logIncome } = useIncomeLog(user?.uid, monthKey);
-
-  const pendingSources = getPendingSources(sources, loggedSourceIds);
+  const { pendingSources, logPending } = usePendingIncome(user?.uid, sources);
 
   // Request notification permission and fire browser notification on payday
   useEffect(() => {
@@ -73,8 +71,7 @@ export default function DashboardPage() {
       {/* Payday banner */}
       <PaydayBanner
         pendingSources={pendingSources}
-        loggedSourceIds={loggedSourceIds}
-        onLog={logIncome}
+        onLog={logPending}
       />
 
       {/* Stats row */}

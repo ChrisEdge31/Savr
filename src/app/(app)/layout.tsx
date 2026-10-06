@@ -7,7 +7,7 @@ import { CurrencyProvider } from "@/context/CurrencyContext";
 import { useBudget } from "@/lib/hooks/useBudget";
 import { useGoals } from "@/lib/hooks/useGoals";
 import { useIncomeSources } from "@/lib/hooks/useIncomeSources";
-import { useIncomeLog } from "@/lib/hooks/useIncomeLog";
+import { usePendingIncome } from "@/lib/hooks/usePendingIncome";
 import { useNotifications } from "@/lib/hooks/useNotifications";
 import { currentMonthKey } from "@/lib/utils/dates";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -23,13 +23,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { budget } = useBudget(user?.uid, monthKey);
   const { goals } = useGoals(user?.uid);
   const { sources } = useIncomeSources(user?.uid);
-  const { loggedSourceIds } = useIncomeLog(user?.uid, monthKey);
+  const { pendingSources } = usePendingIncome(user?.uid, sources);
 
   const { notifications, dismiss, dismissAll } = useNotifications({
-    sources,
+    pendingSources,
     goals,
     budgetIncome: budget?.income ?? 0,
-    loggedSourceIds,
   });
 
   useEffect(() => {
